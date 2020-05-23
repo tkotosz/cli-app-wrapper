@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14ad105c975644eba317a3e52444307a",
+    "content-hash": "c8b485c94611a15f55d3496280534aa5",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1219,10 +1219,16 @@
         {
             "name": "tkotosz/cli-app-wrapper-api",
             "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tkotosz/cli-app-wrapper-api.git",
+                "reference": "6531e4e9d4895598dfae6a7ac69d5174375a67e9"
+            },
             "dist": {
-                "type": "path",
-                "url": "../cli-app-wrapper-api",
-                "reference": "2dcbc4938a9956a048254c4daae9c0aa9e75346d"
+                "type": "zip",
+                "url": "https://api.github.com/repos/tkotosz/cli-app-wrapper-api/zipball/6531e4e9d4895598dfae6a7ac69d5174375a67e9",
+                "reference": "6531e4e9d4895598dfae6a7ac69d5174375a67e9",
+                "shasum": ""
             },
             "type": "library",
             "autoload": {
@@ -1230,6 +1236,7 @@
                     "Tkotosz\\CliAppWrapperApi\\": "src"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "authors": [
                 {
                     "name": "Tibor Kotosz",
@@ -1237,17 +1244,21 @@
                 }
             ],
             "description": "CLI App Wrapper API",
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2020-05-23T15:16:13+00:00"
         },
         {
             "name": "tkotosz/composer-wrapper",
             "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tkotosz/composer-wrapper.git",
+                "reference": "7d2b605b0dd693afaec3826dcb335bc00c4af2e6"
+            },
             "dist": {
-                "type": "path",
-                "url": "../composer-wrapper",
-                "reference": "d47bedc5300219943503b3228d6cb51bc86638fd"
+                "type": "zip",
+                "url": "https://api.github.com/repos/tkotosz/composer-wrapper/zipball/7d2b605b0dd693afaec3826dcb335bc00c4af2e6",
+                "reference": "7d2b605b0dd693afaec3826dcb335bc00c4af2e6",
+                "shasum": ""
             },
             "require": {
                 "composer/composer": "2.0.x-dev",
@@ -1261,6 +1272,7 @@
                     "Tkotosz\\ComposerWrapper\\": "src"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -1271,9 +1283,7 @@
                 }
             ],
             "description": "Composer Wrapper for composer 2.x",
-            "transport-options": {
-                "relative": true
-            }
+            "time": "2020-05-23T15:12:40+00:00"
         }
     ],
     "packages-dev": [],

@@ -19,15 +19,5 @@
         "psr-4": {
             "Tkotosz\\CliAppWrapper\\": "src"
         }
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../composer-wrapper/"
-        },
-        {
-            "type": "path",
-            "url": "../cli-app-wrapper-api/"
-        }
-    ]
+    }
 }
