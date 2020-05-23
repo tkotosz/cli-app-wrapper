@@ -1,0 +1,33 @@
+{
+    "name": "tkotosz/cli-app-wrapper",
+    "description": "CLI App Wrapper",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "tkotosz",
+            "email": "kotosy@gmail.com"
+        }
+    ],
+    "require": {
+        "tkotosz/composer-wrapper": "*@dev",
+        "tkotosz/cli-app-wrapper-api": "*@dev"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Tkotosz\\CliAppWrapper\\": "src"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../composer-wrapper/"
+        },
+        {
+            "type": "path",
+            "url": "../cli-app-wrapper-api/"
+        }
+    ]
+}
