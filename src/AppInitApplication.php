@@ -19,11 +19,10 @@ class AppInitApplication implements Application
     {
         if (count($_SERVER['argv']) > 2 || !isset($_SERVER['argv'][1]) || $_SERVER['argv'][1] !== 'init') {
             echo "Application is not yet initialized" . PHP_EOL;
-            echo "Please run init or local init or global init" . PHP_EOL;
+            echo "Please run init or global init" . PHP_EOL;
             echo "Help:" . PHP_EOL;
             echo "  init          init locally" . PHP_EOL;
-            echo "  local init    init locally" . PHP_EOL;
-            echo "  global init   init global" . PHP_EOL;
+            echo "  global init   init globally" . PHP_EOL;
 
             exit(0);
         }

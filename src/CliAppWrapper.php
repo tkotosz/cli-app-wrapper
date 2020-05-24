@@ -74,13 +74,6 @@ class CliAppWrapper
         $global = $this->getHomeDir();
         $mode = $_SERVER['argv'][1] ?? null;
 
-        // local was requested specifically
-        if ($mode === 'local') {
-            unset($_SERVER['argv'][1]);
-            $_SERVER['argv'] = array_values($_SERVER['argv']);
-            return $local;
-        }
-
         // global was requested specifically
         if ($mode === 'global') {
             unset($_SERVER['argv'][1]);
@@ -88,17 +81,6 @@ class CliAppWrapper
             return $global;
         }
 
-        // if local initialized already then lets go with that
-        if (file_exists($local . '/' . $config->appDir() . '/autoload.php')) {
-            return $local;
-        }
-
-        // if global initialized already then lets go with that
-        if (file_exists($global . '/' . $config->appDir() . '/autoload.php')) {
-            return $global;
-        }
-
-        // if the app is not initialized at all then default to local
         return $local;
     }
 
