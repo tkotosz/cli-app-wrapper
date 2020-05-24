@@ -90,6 +90,15 @@ class ApplicationManager implements ApplicationManagerInterface
         );
     }
 
+    public function removeExtensionSource(string $name): int
+    {
+        $config = $this->composer->getComposerConfig();
+
+        return $this->composer->changeComposerConfig(
+            $config->removeRepository($name)
+        );
+    }
+
     public function findExtensionSources(): ExtensionSources
     {
         $config = $this->composer->getComposerConfig();
