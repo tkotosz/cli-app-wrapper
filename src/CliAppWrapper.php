@@ -87,12 +87,17 @@ class CliAppWrapper
         }
 
         // if local initialized already then lets go with that
-        if (file_exists(getcwd() . '/' . $config->appDir() . '/autoload.php')) {
+        if (file_exists($local . '/' . $config->appDir() . '/autoload.php')) {
             return $local;
         }
 
-        // fallback to global
-        return $global;
+        // if global initialized already then lets go with that
+        if (file_exists($global . '/' . $config->appDir() . '/autoload.php')) {
+            return $global;
+        }
+
+        // if the app is not initialized at all then default to local
+        return $local;
     }
 
     private function getHomeDir(): string
