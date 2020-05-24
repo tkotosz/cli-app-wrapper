@@ -17,24 +17,42 @@ class AppInitApplication implements Application
 
     public function run(): void
     {
-        if (count($_SERVER['argv']) > 2 || !isset($_SERVER['argv'][1]) || $_SERVER['argv'][1] !== 'init') {
-            echo "Application is not yet initialized" . PHP_EOL;
-            echo "Please run init or global init" . PHP_EOL;
-            echo "Help:" . PHP_EOL;
-            echo "  init          init locally" . PHP_EOL;
-            echo "  global init   init globally" . PHP_EOL;
-
+        if (!$this->isInitRequest($_SERVER['argv'])) {
+            echo $this->buildHelpMessage();
             exit(0);
         }
 
         $result = $this->applicationManager->init();
 
         if ($result !== 0) {
-            echo "Init FAILED" . PHP_EOL;
+            echo "Application Initialization FAILED" . PHP_EOL;
         } else {
-            echo "All OK, Init DONE" . PHP_EOL;
+            echo "Application Successfully Initialized" . PHP_EOL;
         }
 
         exit($result);
+    }
+
+    private function buildHelpMessage(): string
+    {
+        $appConfig = $this->applicationManager->getApplicationConfig();
+        $localInstallDir = $appConfig->getLocalWorkingDir() . DIRECTORY_SEPARATOR . $appConfig->appDir();
+        $globalInstallDir = $appConfig->getGlobalWorkingDir() . DIRECTORY_SEPARATOR . $appConfig->appDir();
+        $helpMessage = '';
+        $helpMessage .= "Application is not yet initialized" . PHP_EOL;
+        $helpMessage .= "Please run init or global init" . PHP_EOL;
+        $helpMessage .= "Help:" . PHP_EOL;
+        $helpMessage .= sprintf('  init          init locally (%s)', $localInstallDir) . PHP_EOL;
+
+        if ($appConfig->isGlobalModeEnabled()) {
+            $helpMessage .= sprintf('  global init   init globally (%s)', $globalInstallDir) . PHP_EOL;
+        }
+
+        return $helpMessage;
+    }
+
+    private function isInitRequest(array $request): bool
+    {
+        return count($request) == 2 && $request[1] === 'init';
     }
 }

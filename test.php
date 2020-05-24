@@ -15,7 +15,8 @@ $config =  [
         [
             'package_type' => 'tkotosz-fooapp-extension',
             'extension_class_config_field' => 'tkotosz-fooapp-extension-class',
-        ]
+        ],
+    'global_mode_enabled' => true
 ];
 
 (new CliAppWrapper)

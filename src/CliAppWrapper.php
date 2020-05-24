@@ -70,26 +70,15 @@ class CliAppWrapper
 
     private function locateWorkingDir(ApplicationConfig $config): string
     {
-        $local = getcwd();
-        $global = $this->getHomeDir();
         $mode = $_SERVER['argv'][1] ?? null;
 
         // global was requested specifically
-        if ($mode === 'global') {
+        if ($config->isGlobalModeEnabled() && $mode === 'global') {
             unset($_SERVER['argv'][1]);
             $_SERVER['argv'] = array_values($_SERVER['argv']);
-            return $global;
+            return $config->getGlobalWorkingDir();
         }
 
-        return $local;
-    }
-
-    private function getHomeDir(): string
-    {
-        if ($path = getenv('XDG_CONFIG_HOME')) {
-            return $path;
-        }
-
-        return getenv('HOME') ?: (getenv('HOMEDRIVE') . DIRECTORY_SEPARATOR . getenv('HOMEPATH'));
+        return $config->getLocalWorkingDir();
     }
 }
