@@ -46,8 +46,8 @@ class ApplicationManager implements ApplicationManagerInterface
         }
 
         $config = $this->composer->getComposerConfig();
-        foreach ($this->config->repositories() as $repository) {
-            $config = $config->addRepository($repository['type'], $repository['url']);
+        foreach ($this->config->repositories() as $key => $repository) {
+            $config = $config->addRepository($key, $repository['type'], $repository['url']);
         }
         $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
 
