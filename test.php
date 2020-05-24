@@ -6,29 +6,16 @@ use Tkotosz\CliAppWrapperApi\ApplicationConfig;
 require __DIR__ . '/vendor/autoload.php';
 
 $config =  [
-    'app_name' => 'Bar App',
-    'app_package' => 'tkotosz/barapp-src',
+    'app_name' => 'Foo App',
+    'app_package' => 'tkotosz/fooapp-src',
     'app_version' => '*',
-    'app_dir' => '.barapp',
-    'app_factory' => 'Tkotosz\\BarApp\\ApplicationFactory',
+    'app_dir' => '.fooapp',
+    'app_factory' => 'Tkotosz\\FooApp\\ApplicationFactory',
     'app_extensions' =>
         [
-            'package_type' => 'barapp-extension',
-            'extension_class_config_field' => 'barapp-extension-class',
-        ],
-    'repositories' =>
-        [
-            0 =>
-                [
-                    'type' => 'path',
-                    'url' => '../composertest/barapp-src/',
-                ],
-            1 =>
-                [
-                    'type' => 'path',
-                    'url' => '../composertest/barapp-extensions/*',
-                ],
-        ],
+            'package_type' => 'tkotosz-fooapp-extension',
+            'extension_class_config_field' => 'tkotosz-fooapp-extension-class',
+        ]
 ];
 
 (new CliAppWrapper)

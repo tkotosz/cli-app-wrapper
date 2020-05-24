@@ -30,7 +30,6 @@ class CliAppWrapper
             return $this->createApplication($composer, $config, $workingDir);
         } catch (\Exception $e) {
             echo $e->getMessage() . PHP_EOL;
-            echo $output->fetch();
             exit(255);
         }
     }
