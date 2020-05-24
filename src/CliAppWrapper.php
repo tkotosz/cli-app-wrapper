@@ -2,6 +2,7 @@
 
 namespace Tkotosz\CliAppWrapper;
 
+use Exception;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -22,21 +23,22 @@ class CliAppWrapper
             $workingDir = $this->locateWorkingDir($config);
             $composerFilePath = $workingDir . DIRECTORY_SEPARATOR . $config->appDir() . DIRECTORY_SEPARATOR . 'app.json';
             $composer = new Composer(new Filesystem(), new ArgvInput(), $output, $composerFilePath);
+            $applicationManager = new ApplicationManager($composer, $config, $workingDir);
 
             if (!$this->autoloadWrappedApplication($config, $workingDir)) {
-                return new AppInitApplication($composer, $config, $workingDir);
+                return new AppInitApplication($applicationManager);
             }
 
-            return $this->createApplication($composer, $config, $workingDir);
-        } catch (\Exception $e) {
+            return $this->createApplication($applicationManager);
+        } catch (Exception $e) {
             echo $e->getMessage() . PHP_EOL;
             exit(255);
         }
     }
 
-    private function createApplication(Composer $composer, ApplicationConfig $config, string $workingDir): Application
+    private function createApplication(ApplicationManager $applicationManager): Application
     {
-        $appFactory = $config->appFactory();
+        $appFactory = $applicationManager->getApplicationConfig()->appFactory();
 
         if (!class_exists($appFactory)) {
             throw new RuntimeException(
@@ -50,7 +52,7 @@ class CliAppWrapper
             );
         }
 
-        return $appFactory::create(new ApplicationManager($composer, $config, $workingDir));
+        return $appFactory::create($applicationManager);
     }
 
     private function autoloadWrappedApplication(ApplicationConfig $config, string $workingDir): bool

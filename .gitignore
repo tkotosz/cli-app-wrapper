@@ -1,2 +1,3 @@
 /vendor/
 /.fooapp/
+composer.lock

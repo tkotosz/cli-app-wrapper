@@ -2,27 +2,17 @@
 
 namespace Tkotosz\CliAppWrapper;
 
-use RuntimeException;
-use Tkotosz\CliAppWrapperApi\ApplicationConfig;
 use Tkotosz\CliAppWrapperApi\Application;
-use Tkotosz\ComposerWrapper\Composer;
+use Tkotosz\CliAppWrapperApi\ApplicationManager as ApplicationManagerInterface;
 
 class AppInitApplication implements Application
 {
-    /** @var Composer */
-    private $composer;
+    /** @var ApplicationManagerInterface */
+    private $applicationManager;
 
-    /** @var ApplicationConfig */
-    private $config;
-
-    /** @var string */
-    private $workingDir;
-
-    public function __construct(Composer $composer, ApplicationConfig $config, string $workingDir)
+    public function __construct(ApplicationManagerInterface $applicationManager)
     {
-        $this->composer = $composer;
-        $this->config = $config;
-        $this->workingDir = $workingDir;
+        $this->applicationManager = $applicationManager;
     }
 
     public function run(): void
@@ -38,28 +28,14 @@ class AppInitApplication implements Application
             exit(0);
         }
 
-        $result = $this->composer->init($this->workingDir . DIRECTORY_SEPARATOR . $this->config->appDir());
+        $result = $this->applicationManager->init();
+
         if ($result !== 0) {
-            throw new RuntimeException('Could not initialize the application');
+            echo "Init FAILED" . PHP_EOL;
+        } else {
+            echo "All OK, Init DONE" . PHP_EOL;
         }
 
-        $config = $this->composer->getComposerConfig();
-        foreach ($this->config->repositories() as $repository) {
-            $config = $config->addRepository($repository['type'], $repository['url']);
-        }
-        $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
-
-        $result = $this->composer->changeComposerConfig($config);
-        if ($result !== 0) {
-            throw new RuntimeException('Could not initialize the application');
-        }
-
-        $this->composer->installPackage($this->config->appPackage(), $this->config->appVersion());
-        if ($result !== 0) {
-            throw new RuntimeException('Could not initialize the application');
-        }
-
-        echo "All OK, Init DONE" . PHP_EOL;
         exit($result);
     }
 }

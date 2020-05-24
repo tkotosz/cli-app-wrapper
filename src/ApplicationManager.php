@@ -38,6 +38,32 @@ class ApplicationManager implements ApplicationManagerInterface
         return $this->workingDir;
     }
 
+    public function init(): int
+    {
+        $result = $this->composer->init($this->workingDir . DIRECTORY_SEPARATOR . $this->config->appDir());
+        if ($result !== 0) {
+            return $result;
+        }
+
+        $config = $this->composer->getComposerConfig();
+        foreach ($this->config->repositories() as $repository) {
+            $config = $config->addRepository($repository['type'], $repository['url']);
+        }
+        $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
+
+        $result = $this->composer->changeComposerConfig($config);
+        if ($result !== 0) {
+            return $result;
+        }
+
+        $this->composer->installPackage($this->config->appPackage(), $this->config->appVersion());
+        if ($result !== 0) {
+            return $result;
+        }
+
+        return 0;
+    }
+
     public function updateExtensions(): int
     {
         return $this->composer->installPackages();
