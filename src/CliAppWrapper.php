@@ -76,9 +76,9 @@ class CliAppWrapper
         if ($config->isGlobalModeEnabled() && $mode === 'global') {
             unset($_SERVER['argv'][1]);
             $_SERVER['argv'] = array_values($_SERVER['argv']);
-            return $config->getGlobalWorkingDir();
+            return $config->globalWorkingDir();
         }
 
-        return $config->getLocalWorkingDir();
+        return $config->localWorkingDir();
     }
 }
