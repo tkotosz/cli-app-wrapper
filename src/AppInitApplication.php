@@ -3,16 +3,20 @@
 namespace Tkotosz\CliAppWrapper;
 
 use Tkotosz\CliAppWrapperApi\Application;
-use Tkotosz\CliAppWrapperApi\ApplicationManager as ApplicationManagerInterface;
 
 class AppInitApplication implements Application
 {
-    /** @var ApplicationManagerInterface */
+    /** @var ApplicationManager */
     private $applicationManager;
 
-    public function __construct(ApplicationManagerInterface $applicationManager)
+    public function __construct(ApplicationManager $applicationManager)
     {
         $this->applicationManager = $applicationManager;
+    }
+
+    public function init(): int
+    {
+        return 0;
     }
 
     public function run(): void
@@ -36,12 +40,11 @@ class AppInitApplication implements Application
     private function buildHelpMessage(): string
     {
         $appConfig = $this->applicationManager->getApplicationConfig();
-        $globalMode = $appConfig->globalWorkingDir() === $this->applicationManager->getWorkingDirectory();
-        $localInstallDir = $appConfig->localApplicationDir();
-        $globalInstallDir = $appConfig->globalApplicationDir();
+        $localInstallDir = $this->applicationManager->getLocalApplicationDirectory();
+        $globalInstallDir = $this->applicationManager->getGlobalApplicationDirectory();
 
         $helpMessage = '';
-        if ($globalMode) {
+        if ($this->applicationManager->getWorkingMode()->isGlobal()) {
             $helpMessage .= "Application is not yet initialized globally" . PHP_EOL;
             $helpMessage .= "Please run the global init command to initialize the application globally" . PHP_EOL;
             $helpMessage .= "Help:" . PHP_EOL;

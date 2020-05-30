@@ -27,6 +27,6 @@ class ExtensionRemoveCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->applicationManager->removeExtension($input->getArgument('extension') ?? '');
+        return $this->applicationManager->removeExtension($input->getArgument('extension') ?? '')->toInt();
     }
 }

@@ -39,6 +39,6 @@ class ExtensionSourceAddCommand extends Command
                 $input->getArgument('type'),
                 $input->getArgument('url')
             )
-        );
+        )->toInt();
     }
 }

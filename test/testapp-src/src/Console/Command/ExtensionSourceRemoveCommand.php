@@ -32,6 +32,6 @@ class ExtensionSourceRemoveCommand extends Command
     {
         return $this->applicationManager->removeExtensionSource(
             $input->getArgument('name')
-        );
+        )->toInt();
     }
 }

@@ -27,6 +27,6 @@ class ExtensionInstallCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->applicationManager->installExtension($input->getArgument('extension'));
+        return $this->applicationManager->installExtension($input->getArgument('extension'))->toInt();
     }
 }
