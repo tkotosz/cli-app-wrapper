@@ -22,15 +22,11 @@ class ExtensionInstallCommand extends Command
     protected function configure()
     {
         $this->setName('extension:install')
-            ->addArgument('extension', InputArgument::OPTIONAL, 'Extension to install');
+            ->addArgument('extension', InputArgument::REQUIRED, 'Extension to install');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($input->getArgument('extension')) {
-            return $this->applicationManager->installExtension($input->getArgument('extension'));
-        } else {
-            return $this->applicationManager->updateExtensions();
-        }
+        return $this->applicationManager->installExtension($input->getArgument('extension'));
     }
 }

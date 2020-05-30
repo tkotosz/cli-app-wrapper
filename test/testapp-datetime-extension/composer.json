@@ -7,7 +7,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Tkotosz\\FooApp\\DateTimeExtension\\": "src"
+            "Tkotosz\\TestApp\\DateTimeExtension\\": "src"
         }
     },
     "minimum-stability": "dev",
