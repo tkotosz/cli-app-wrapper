@@ -1,0 +1,18 @@
+{
+    "name": "tkotosz/testapp-datetime-extension",
+    "type": "tkotosz-testapp-extension",
+    "license": "MIT",
+    "require": {
+        "tkotosz/testapp-src": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tkotosz\\FooApp\\DateTimeExtension\\": "src"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "tkotosz-testapp-extension-class": "Tkotosz\\TestApp\\DateTimeExtension\\DateTimeExtension"
+    }
+}

@@ -7,15 +7,21 @@ require __DIR__ . '/vendor/autoload.php';
 
 $config =  [
     'app_name' => 'Foo App',
-    'app_package' => 'tkotosz/fooapp-src',
+    'app_package' => 'tkotosz/testapp-src',
     'app_version' => '*',
-    'app_dir' => '.fooapp',
-    'app_factory' => 'Tkotosz\\FooApp\\ApplicationFactory',
+    'app_dir' => '.testapp',
+    'app_factory' => 'Tkotosz\\TestApp\\ApplicationFactory',
     'app_extensions' =>
         [
-            'package_type' => 'tkotosz-fooapp-extension',
-            'extension_class_config_field' => 'tkotosz-fooapp-extension-class',
+            'package_type' => 'tkotosz-testapp-extension',
+            'extension_class_config_field' => 'tkotosz-testapp-extension-class',
         ],
+    'repositories' => [
+        'test' => [
+            'type' => 'path',
+            'url' => 'test/*'
+        ]
+    ],
     'global_mode_enabled' => true
 ];
 

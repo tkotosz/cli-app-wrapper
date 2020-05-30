@@ -1,0 +1,23 @@
+{
+  "name": "tkotosz/testapp-src",
+  "type": "project",
+  "description": "Test App",
+  "authors": [
+    {
+      "name": "Tibor Kotosz",
+      "email": "kotosy@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "ext-json": "*",
+    "tkotosz/cli-app-wrapper-api": "*",
+    "symfony/console": "^5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tkotosz\\TestApp\\": "src"
+    }
+  }
+}

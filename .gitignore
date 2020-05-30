@@ -1,3 +1,4 @@
 /vendor/
 /.fooapp/
+/.testapp/
 composer.lock
