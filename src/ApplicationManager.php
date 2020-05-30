@@ -126,6 +126,16 @@ class ApplicationManager implements ApplicationManagerInterface
 
     public function installExtension(string $extensionPackage, string $extensionVersion = null): ApplicationCommandResult
     {
+        if ($this->config->allowsExtensions() === null) {
+            return ApplicationCommandResult::failure();
+        }
+
+        $package = $this->composer()->findPackageByName($extensionPackage);
+
+        if ($package === null || $package->getType() !== $this->config->appExtensionsPackageType()) {
+            return ApplicationCommandResult::failure();
+        }
+
         return ApplicationCommandResult::fromInt(
             $this->composer()->installPackage($extensionPackage, $extensionVersion)
         );
@@ -133,6 +143,10 @@ class ApplicationManager implements ApplicationManagerInterface
 
     public function removeExtension(string $extensionPackage): ApplicationCommandResult
     {
+        if ($this->config->allowsExtensions() === null) {
+            return ApplicationCommandResult::failure(255);
+        }
+
         return ApplicationCommandResult::fromInt(
             $this->composer()->removePackage($extensionPackage)
         );
@@ -140,6 +154,10 @@ class ApplicationManager implements ApplicationManagerInterface
 
     public function findInstalledExtensions(): Extensions
     {
+        if ($this->config->allowsExtensions() === null) {
+            return Extensions::fromItems([]);
+        }
+
         return $this->transformPackagesToExtensions(
             $this->composer()
                 ->findInstalledPackages()
@@ -149,6 +167,10 @@ class ApplicationManager implements ApplicationManagerInterface
 
     public function findAvailableExtensions(): Extensions
     {
+        if ($this->config->allowsExtensions() === null) {
+            return Extensions::fromItems([]);
+        }
+
         return $this->transformPackagesToExtensions(
             $this->composer()->findPackagesByType($this->config->appExtensionsPackageType())
         );

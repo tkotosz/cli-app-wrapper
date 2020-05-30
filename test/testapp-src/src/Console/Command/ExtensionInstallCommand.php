@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Tkotosz\CliAppWrapperApi\ApplicationManager;
 
 class ExtensionInstallCommand extends Command
@@ -27,6 +28,15 @@ class ExtensionInstallCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->applicationManager->installExtension($input->getArgument('extension'))->toInt();
+        $io = new SymfonyStyle($input, $output);
+        $result = $this->applicationManager->installExtension($input->getArgument('extension'));
+
+        if ($result->isFailure()) {
+            $io->error('Extension Installation Failed');
+            return 1;
+        }
+
+        $io->success('Extension Successfully Installed');
+        return 0;
     }
 }
