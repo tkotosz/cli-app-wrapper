@@ -8,6 +8,8 @@ use RuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Filesystem\Filesystem;
+use Technodelight\GitShell\Api as Git;
+use Technodelight\ShellExec\Exec;
 use Tkotosz\CliAppWrapperApi\Application;
 use Tkotosz\CliAppWrapperApi\ApplicationCommandResult;
 use Tkotosz\CliAppWrapperApi\ApplicationConfig;
@@ -68,8 +70,22 @@ class ApplicationManager implements ApplicationManagerInterface
 
     public function getLocalWorkingDirectory(): WorkingDirectory
     {
-        // TODO Allow to use git working dir as local working dir instead of cwd
-        return WorkingDirectory::fromString(getcwd());
+        foreach ($this->config->localWorkingDirectoryResolvers() as $resolver) {
+            if ($resolver === 'cwd' && ($path = $this->findCurrentWorkingDirectory())) {
+                return WorkingDirectory::fromString($path);
+            }
+
+            if ($resolver === 'git' && ($path = $this->findGitRootDirectory())) {
+                return WorkingDirectory::fromString($path);
+            }
+        }
+
+        throw new RuntimeException(
+            sprintf(
+                'Error: Failed to resolve working directory (resolvers: "%s")',
+                implode('","', $this->config->localWorkingDirectoryResolvers())
+            )
+        );
     }
 
     public function getGlobalWorkingDirectory(): WorkingDirectory
@@ -289,5 +305,17 @@ class ApplicationManager implements ApplicationManagerInterface
             $package->getVersion(),
             $package->getExtra()[$this->config->appExtensionsExtensionClassConfigField()]
         );
+    }
+
+    private function findGitRootDirectory(): ?string
+    {
+        $git = new Git(new Exec('/usr/bin/env git'));
+
+        return $git->topLevelDirectory() ?: null;
+    }
+
+    private function findCurrentWorkingDirectory(): ?string
+    {
+        return getcwd() ?: null;
     }
 }

@@ -11,7 +11,8 @@
     ],
     "require": {
         "tkotosz/composer-wrapper": "*@dev",
-        "tkotosz/cli-app-wrapper-api": "dev-master"
+        "tkotosz/cli-app-wrapper-api": "dev-master",
+        "technodelight/php-git": "^1.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

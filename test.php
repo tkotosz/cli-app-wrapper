@@ -22,7 +22,8 @@ $config =  [
             'url' => 'test/*'
         ]
     ],
-    'global_mode_enabled' => true
+    'global_mode_enabled' => true,
+    'local_working_directory_resolvers' => ['git', 'cwd']
 ];
 
 (new CliAppWrapper)
