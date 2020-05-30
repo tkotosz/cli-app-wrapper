@@ -11,7 +11,7 @@
     ],
     "require": {
         "tkotosz/composer-wrapper": "*@dev",
-        "tkotosz/cli-app-wrapper-api": "dev-feature/new-api-interface"
+        "tkotosz/cli-app-wrapper-api": "dev-master"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

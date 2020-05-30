@@ -2,13 +2,12 @@
 
 namespace Tkotosz\TestApp;
 
+use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Tkotosz\TestApp\Console\Command\ExtensionInstallCommand;
 use Tkotosz\TestApp\Console\Command\ExtensionListCommand;
 use Tkotosz\TestApp\Console\Command\ExtensionRemoveCommand;
@@ -32,12 +31,21 @@ class Application implements ApplicationInterface
 
     public function init(): int
     {
-        $consoleApp = new \Symfony\Component\Console\Application(
+        $consoleApp = new ConsoleApplication(
             $this->applicationManager->getApplicationConfig()->appName(),
             $this->applicationManager->getApplicationConfig()->appVersion()
         );
 
-        $consoleApp->add(new class extends Command {
+        $consoleApp->add(new class ($this->applicationManager) extends Command {
+            /** @var ApplicationManager */
+            private $applicationManager;
+
+            public function __construct(ApplicationManager $applicationManager)
+            {
+                $this->applicationManager = $applicationManager;
+                parent::__construct();
+            }
+
             protected function configure()
             {
                 $this->setName('init');
@@ -47,9 +55,18 @@ class Application implements ApplicationInterface
             {
                 $questionHelper = new SymfonyQuestionHelper();
 
-                $result = $questionHelper->ask($input, $output, new Question('How are you?', 'I am fine, thanks.'));
+                $result = $questionHelper->ask(
+                    $input,
+                    $output,
+                    new ConfirmationQuestion('Do you want to install datetime ext by default?')
+                );
 
-                return ($result === 'I am fine, thanks.') ? 0 : 1;
+                if ($result) {
+                    $output->writeln('Installing datetime extension');
+                    $this->applicationManager->installExtension('tkotosz/testapp-datetime-extension');
+                }
+
+                return 0;
             }
         });
 
@@ -62,7 +79,7 @@ class Application implements ApplicationInterface
 
     public function run(): void
     {
-        $consoleApp = new \Symfony\Component\Console\Application(
+        $consoleApp = new ConsoleApplication(
             $this->applicationManager->getApplicationConfig()->appName(),
             $this->applicationManager->getApplicationConfig()->appVersion()
         );

@@ -3,6 +3,7 @@
 namespace Tkotosz\CliAppWrapper;
 
 use Composer\Package\PackageInterface;
+use Exception;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -180,37 +181,42 @@ class ApplicationManager implements ApplicationManagerInterface
 
     public function init(): int
     {
-        $result = $this->composer()->init($this->getWorkingDirectory() . DIRECTORY_SEPARATOR . $this->config->appDir());
-        if ($result !== 0) {
+        try {
+            $result = $this->composer()->init($this->getWorkingDirectory() . DIRECTORY_SEPARATOR . $this->config->appDir());
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            $config = $this->composer()->getComposerConfig();
+            foreach ($this->config->repositories() as $key => $repository) {
+                $config = $config->addRepository($key, $repository['type'], $repository['url']);
+            }
+            $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
+
+            $result = $this->composer()->changeComposerConfig($config);
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            $result = $this->composer()->installPackage($this->config->appPackage(), $this->config->appVersion());
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            $result = $this->createApplication()->init();
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            return 0;
+        } catch (Exception $e) {
             $this->destroy();
-            return $result;
+            return 255;
         }
-
-        $config = $this->composer()->getComposerConfig();
-        foreach ($this->config->repositories() as $key => $repository) {
-            $config = $config->addRepository($key, $repository['type'], $repository['url']);
-        }
-        $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
-
-        $result = $this->composer()->changeComposerConfig($config);
-        if ($result !== 0) {
-            $this->destroy();
-            return $result;
-        }
-
-        $result = $this->composer()->installPackage($this->config->appPackage(), $this->config->appVersion());
-        if ($result !== 0) {
-            $this->destroy();
-            return $result;
-        }
-
-        $result = $this->createApplication()->init();
-        if ($result !== 0) {
-            $this->destroy();
-            return $result;
-        }
-
-        return 0;
     }
 
     public function createApplication(): Application
