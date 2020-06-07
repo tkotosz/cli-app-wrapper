@@ -29,9 +29,13 @@ class CliAppWrapper
 
     private function resolveWorkingMode(ApplicationConfig $config): WorkingMode
     {
-        $mode = $_SERVER['argv'][1] ?? null;
+        if ($config->isSingleModeApplication()) {
+            return $config->defaultWorkingMode();
+        }
 
-        if ($config->isGlobalModeEnabled() && $mode === 'global') {
+        $requestedMode = $_SERVER['argv'][1] ?? null;
+
+        if ($requestedMode === 'global') {
             unset($_SERVER['argv'][1]);
             $_SERVER['argv'] = array_values($_SERVER['argv']);
             return WorkingMode::global();

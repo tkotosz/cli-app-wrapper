@@ -23,6 +23,7 @@ $config =  [
         ]
     ],
     'global_mode_enabled' => true,
+    'local_mode_enabled' => true,
     'local_working_directory_resolvers' => ['git', 'cwd']
 ];
 

@@ -37,7 +37,7 @@ class InitHelpCommand extends Command
             $output->writeln(
                 sprintf(
                     '  <info>%s</info>%s%s',
-                    'global init',
+                    $appConfig->isSingleModeApplication() ? 'init' : 'global init',
                     str_repeat(' ', 2),
                     sprintf('initialize the application globally (%s)', $globalInstallDir)
                 )
