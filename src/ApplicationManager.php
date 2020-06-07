@@ -333,7 +333,11 @@ class ApplicationManager implements ApplicationManagerInterface
     {
         $git = new Git(new Exec('/usr/bin/env git'));
 
-        return $git->topLevelDirectory() ?: null;
+        try {
+            return $git->topLevelDirectory() ?: null;
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     private function findCurrentWorkingDirectory(): ?string
