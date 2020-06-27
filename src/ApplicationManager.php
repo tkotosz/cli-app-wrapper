@@ -298,7 +298,7 @@ class ApplicationManager implements ApplicationManagerInterface
         }
 
         $io->title('2. Download latest application version');
-        $newAppBin = sys_get_temp_dir() . $this->config->appExecutableName();
+        $newAppBin = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $this->config->appExecutableName();
         $release = $this->github->repo()->releases()->all($this->config->githubUser(), $this->config->githubRepository())[0] ?? null;
         if ($release === null || !isset($release['assets'][0]['browser_download_url'])) {
             $io->error('Could not find any installable application release.');
