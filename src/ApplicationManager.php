@@ -5,6 +5,7 @@ namespace Tkotosz\CliAppWrapper;
 use Composer\Package\PackageInterface;
 use Exception;
 use Github\Client;
+use Phar;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -285,10 +286,14 @@ class ApplicationManager implements ApplicationManagerInterface
     public function update(): ApplicationCommandResult
     {
         $io = new SymfonyStyle(new ArgvInput(), new ConsoleOutput());
-        $mode = $this->getWorkingMode()->isGlobal() ? 'global' : '';
-        $currentAppBin = $this->getWorkingDirectory()->pathToFile(FileName::fromString($this->config->appExecutableName()))->toString();
         $io->writeln('Updating Application...');
 
+        $mode = $this->getWorkingMode()->isGlobal() ? 'global' : '';
+        $currentAppBin = Phar::running(false);
+        if (empty($currentAppBin)) {
+            $io->error('Not running phar application, upgrade aborted.');
+            return ApplicationCommandResult::failure();
+        }
 
         $io->title('1. Collect list of installed extensions');
         $extensions = [];
