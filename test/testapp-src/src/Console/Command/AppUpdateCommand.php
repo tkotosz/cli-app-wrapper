@@ -28,6 +28,6 @@ class AppUpdateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->applicationManager->update();
+        return $this->applicationManager->update()->toInt();
     }
 }
