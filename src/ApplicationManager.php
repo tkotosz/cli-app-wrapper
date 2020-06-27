@@ -290,6 +290,7 @@ class ApplicationManager implements ApplicationManagerInterface
 
         $mode = $this->getWorkingMode()->isGlobal() ? 'global' : '';
         $currentAppBin = Phar::running(false);
+        $successResult = ApplicationCommandResult::success(); // avoid "internal corruption of phar" error
         if (empty($currentAppBin)) {
             $io->error('Not running phar application, upgrade aborted.');
             return ApplicationCommandResult::failure();
@@ -360,7 +361,7 @@ class ApplicationManager implements ApplicationManagerInterface
 
         $io->success('Application successfully updated.');
 
-        return ApplicationCommandResult::success();
+        return $successResult;
     }
 
     public function createApplication(): Application
