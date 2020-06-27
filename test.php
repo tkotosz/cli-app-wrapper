@@ -6,7 +6,7 @@ use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
 require __DIR__ . '/vendor/autoload.php';
 
 $config =  [
-    'app_name' => 'Test App',
+    'app_name' => 'Test App 2.0',
     'app_package' => 'tkotosz/testapp-src',
     'app_version' => '*',
     'app_dir' => '.testapp',

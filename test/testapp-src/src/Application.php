@@ -3,11 +3,11 @@
 namespace Tkotosz\TestApp;
 
 use Symfony\Component\Console\Application as ConsoleApplication;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Tkotosz\TestApp\Console\Command\AppUpdateCommand;
 use Tkotosz\TestApp\Console\Command\ExtensionInstallCommand;
 use Tkotosz\TestApp\Console\Command\ExtensionListCommand;
 use Tkotosz\TestApp\Console\Command\ExtensionRemoveCommand;
@@ -31,50 +31,31 @@ class Application implements ApplicationInterface
 
     public function init(): int
     {
-        $consoleApp = new ConsoleApplication(
-            $this->applicationManager->getApplicationConfig()->appName(),
-            $this->applicationManager->getApplicationConfig()->appVersion()
+        $input = new ArgvInput();
+        $output = new ConsoleOutput();
+        $questionHelper = new SymfonyQuestionHelper();
+
+        $extensions = [];
+        foreach ($this->applicationManager->findInstalledExtensions() as $extension) {
+            $extensions[] = $extension->name();
+        }
+
+        if (in_array('tkotosz/testapp-datetime-extension', $extensions)) {
+            return 0;
+        }
+
+        $result = $questionHelper->ask(
+            $input,
+            $output,
+            new ConfirmationQuestion('Do you want to install datetime ext by default?')
         );
 
-        $consoleApp->add(new class ($this->applicationManager) extends Command {
-            /** @var ApplicationManager */
-            private $applicationManager;
+        if ($result) {
+            $output->writeln('Installing datetime extension');
+            return $this->applicationManager->installExtension('tkotosz/testapp-datetime-extension')->toInt();
+        }
 
-            public function __construct(ApplicationManager $applicationManager)
-            {
-                $this->applicationManager = $applicationManager;
-                parent::__construct();
-            }
-
-            protected function configure()
-            {
-                $this->setName('init');
-            }
-
-            protected function execute(InputInterface $input, OutputInterface $output)
-            {
-                $questionHelper = new SymfonyQuestionHelper();
-
-                $result = $questionHelper->ask(
-                    $input,
-                    $output,
-                    new ConfirmationQuestion('Do you want to install datetime ext by default?')
-                );
-
-                if ($result) {
-                    $output->writeln('Installing datetime extension');
-                    $this->applicationManager->installExtension('tkotosz/testapp-datetime-extension');
-                }
-
-                return 0;
-            }
-        });
-
-        $consoleApp->setCatchExceptions(true);
-        $consoleApp->setAutoExit(false);
-        $consoleApp->setDefaultCommand('init');
-
-        return $consoleApp->run();
+        return 0;
     }
 
     public function run(): void
@@ -93,6 +74,8 @@ class Application implements ApplicationInterface
         $consoleApp->add(new ExtensionListCommand($this->applicationManager));
         $consoleApp->add(new ExtensionInstallCommand($this->applicationManager));
         $consoleApp->add(new ExtensionRemoveCommand($this->applicationManager));
+
+        $consoleApp->add(new AppUpdateCommand($this->applicationManager));
 
         $consoleApp->add(new HelloWorldCommand());
 

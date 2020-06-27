@@ -4,9 +4,11 @@ namespace Tkotosz\CliAppWrapper;
 
 use Composer\Package\PackageInterface;
 use Exception;
+use Github\Client;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use Technodelight\GitShell\Api as Git;
 use Technodelight\ShellExec\Exec;
@@ -20,6 +22,7 @@ use Tkotosz\CliAppWrapperApi\Api\V1\Model\Extension;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\Extensions;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ExtensionSource;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ExtensionSources;
+use Tkotosz\CliAppWrapperApi\Api\V1\Model\FileName;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\RelativePath;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\WorkingDirectory;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\WorkingMode;
@@ -31,6 +34,12 @@ class ApplicationManager implements ApplicationManagerInterface
     /** @var Filesystem */
     private $filesystem;
 
+    /** @var Client */
+    private $github;
+
+    /** @var Downloader */
+    private $downloader;
+
     /** @var ApplicationConfig */
     private $config;
 
@@ -40,9 +49,16 @@ class ApplicationManager implements ApplicationManagerInterface
     /** @var WorkingDirectory|null */
     private $workingDir = null;
 
-    public function __construct(Filesystem $filesystem, ApplicationConfig $config, WorkingMode $workingMode)
-    {
+    public function __construct(
+        Filesystem $filesystem,
+        Client $github,
+        Downloader $downloader,
+        ApplicationConfig $config,
+        WorkingMode $workingMode
+    ) {
         $this->filesystem = $filesystem;
+        $this->github = $github;
+        $this->downloader = $downloader;
         $this->config = $config;
         $this->workingMode = $workingMode;
     }
@@ -217,7 +233,7 @@ class ApplicationManager implements ApplicationManagerInterface
         return ExtensionSources::fromItems($sources);
     }
 
-    public function init(): int
+    public function init(array $extensions = []): int
     {
         try {
             $result = $this->composer()->init($this->getWorkingDirectory() . DIRECTORY_SEPARATOR . $this->config->appDir());
@@ -244,6 +260,15 @@ class ApplicationManager implements ApplicationManagerInterface
                 return $result;
             }
 
+            foreach ($extensions as $extension) {
+                $result = $this->installExtension($extension);
+                if ($result->isFailure()) {
+                    $this->destroy();
+                    return $result->toInt();
+                }
+            }
+
+            $_SERVER['argv'] = []; // avoid leaking original input arguments to the app
             $result = $this->createApplication()->init();
             if ($result !== 0) {
                 $this->destroy();
@@ -255,6 +280,82 @@ class ApplicationManager implements ApplicationManagerInterface
             $this->destroy();
             return 255;
         }
+    }
+
+    public function update(): ApplicationCommandResult
+    {
+        $io = new SymfonyStyle(new ArgvInput(), new ConsoleOutput());
+        $mode = $this->getWorkingMode()->isGlobal() ? 'global' : '';
+        $currentAppBin = $this->getWorkingDirectory()->pathToFile(FileName::fromString($this->config->appExecutableName()))->toString();
+        $io->writeln('Updating Application...');
+
+
+        $io->title('1. Collect list of installed extensions');
+        $extensions = [];
+        foreach ($this->findInstalledExtensions() as $extension) {
+            $io->writeln(sprintf('Found "%s"', $extension->name()));
+            $extensions[] = $extension->name();
+        }
+
+        $io->title('2. Download latest application version');
+        $newAppBin = sys_get_temp_dir() . $this->config->appExecutableName();
+        $release = $this->github->repo()->releases()->all($this->config->githubUser(), $this->config->githubRepository())[0] ?? null;
+        if ($release === null || !isset($release['assets'][0]['browser_download_url'])) {
+            $io->error('Could not find any installable application release.');
+            return ApplicationCommandResult::failure();
+        }
+        $result = $this->downloader->downloadWithCurl(new ConsoleOutput(), $release['assets'][0]['browser_download_url'], $newAppBin);
+        if ($result === false) {
+            $io->error('Could not download latest application version, upgrade aborted.');
+            return ApplicationCommandResult::failure();
+        }
+        chmod($newAppBin, 0755);
+        $io->writeln(sprintf('Latest phar successfully saved to "%s"', $newAppBin));
+
+
+        $io->title('3. Backup current application version');
+        $backupDir = $this->getCurrentAppDirAbsolutePath() . '.bak';
+        $result = rename($this->getCurrentAppDirAbsolutePath(), $backupDir);
+        if ($result === false) {
+            $io->error('Could not backup current application version, upgrade aborted.');
+            unlink($newAppBin);
+            return ApplicationCommandResult::failure();
+        }
+        $io->writeln(sprintf('Backup successfully created at "%s"', $backupDir));
+
+
+        $io->title('4. Init new application version');
+        system(
+            sprintf(
+                '%s %s %s',
+                $newAppBin,
+                implode(' ', [$mode, 'init']),
+                implode(' ', array_map('escapeshellarg', $extensions))
+            )
+        );
+
+
+        $io->title('5. Replace application');
+        $result = rename($newAppBin, $currentAppBin);
+        if ($result === false) {
+            $io->error('Could not replace current application with the new version.');
+
+            $io->title('6. Restore application from backup');
+            system(sprintf('rm -rf %s', escapeshellarg($this->getCurrentAppDirAbsolutePath())));
+            rename($backupDir, $this->getCurrentAppDirAbsolutePath());
+
+            return ApplicationCommandResult::failure();
+        }
+        $io->writeln('Application successfully replaced with the new version.');
+
+
+        $io->title('6. Remove backup');
+        system(sprintf('rm -rf %s', escapeshellarg($backupDir)));
+        $io->writeln(sprintf('Backup successfully removed from "%s"', $backupDir));
+
+        $io->success('Application successfully updated.');
+
+        return ApplicationCommandResult::success();
     }
 
     public function createApplication(): Application
@@ -326,6 +427,17 @@ class ApplicationManager implements ApplicationManagerInterface
             $package->getName(),
             $package->getVersion(),
             $package->getExtra()[$this->config->appExtensionsExtensionClassConfigField()]
+        );
+    }
+
+    private function getCurrentAppDirAbsolutePath(): string
+    {
+        return implode(
+            DIRECTORY_SEPARATOR,
+            [
+                $this->getWorkingDirectory(),
+                $this->config->appDir()
+            ]
         );
     }
 

@@ -3,6 +3,7 @@
 namespace Tkotosz\CliAppWrapper;
 
 use Exception;
+use Github\Client;
 use Symfony\Component\Filesystem\Filesystem;
 use Tkotosz\CliAppWrapperApi\Api\V1\Application;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
@@ -24,7 +25,7 @@ class CliAppWrapper
 
     private function createApplicationManager(ApplicationConfig $config, WorkingMode $workingMode): ApplicationManager
     {
-        return new ApplicationManager(new Filesystem(), $config, $workingMode);
+        return new ApplicationManager(new Filesystem(), new Client(), new Downloader(), $config, $workingMode);
     }
 
     private function resolveWorkingMode(ApplicationConfig $config): WorkingMode

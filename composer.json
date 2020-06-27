@@ -10,9 +10,12 @@
         }
     ],
     "require": {
+        "ext-curl": "*",
         "tkotosz/composer-wrapper": "*@dev",
         "tkotosz/cli-app-wrapper-api": "dev-master",
-        "technodelight/php-git": "^1.0"
+        "technodelight/php-git": "^1.0",
+        "knplabs/github-api": "^2.14",
+        "php-http/guzzle6-adapter": "^1.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

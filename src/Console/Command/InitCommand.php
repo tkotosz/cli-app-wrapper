@@ -3,6 +3,7 @@
 namespace Tkotosz\CliAppWrapper\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -21,13 +22,16 @@ class InitCommand extends Command
 
     protected function configure()
     {
-        $this->setName('init');
+        $this
+            ->setName('init')
+            ->addArgument('extension_list', InputArgument::OPTIONAL | InputArgument::IS_ARRAY)
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
-        $result = $this->applicationManager->init();
+        $result = $this->applicationManager->init($input->getArgument('extension_list') ?? []);
 
         if ($result !== 0) {
             $io->error('Application Initialization FAILED');
