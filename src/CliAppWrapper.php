@@ -4,9 +4,9 @@ namespace Tkotosz\CliAppWrapper;
 
 use Exception;
 use Symfony\Component\Filesystem\Filesystem;
-use Tkotosz\CliAppWrapperApi\Application;
-use Tkotosz\CliAppWrapperApi\ApplicationConfig;
-use Tkotosz\CliAppWrapperApi\WorkingMode;
+use Tkotosz\CliAppWrapperApi\Api\V1\Application;
+use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
+use Tkotosz\CliAppWrapperApi\Api\V1\Model\WorkingMode;
 
 class CliAppWrapper
 {

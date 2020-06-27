@@ -43,7 +43,7 @@ class InitHelpCommand extends Command
                 )
             );
         } else {
-            $io->warning('Application is not yet initialized locally');
+            $io->warning('Application is not yet initialized');
             $output->writeln('<comment>Available commands:</comment>');
             $output->writeln(
                 sprintf(

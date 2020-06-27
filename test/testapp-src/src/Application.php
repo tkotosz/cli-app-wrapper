@@ -16,8 +16,8 @@ use Tkotosz\TestApp\Console\Command\ExtensionSourceListCommand;
 use Tkotosz\TestApp\Console\Command\ExtensionSourceRemoveCommand;
 use Tkotosz\TestApp\Console\Command\GlobalCommand;
 use Tkotosz\TestApp\Console\Command\HelloWorldCommand;
-use Tkotosz\CliAppWrapperApi\Application as ApplicationInterface;
-use Tkotosz\CliAppWrapperApi\ApplicationManager;
+use Tkotosz\CliAppWrapperApi\Api\V1\Application as ApplicationInterface;
+use Tkotosz\CliAppWrapperApi\Api\V1\ApplicationManager;
 
 class Application implements ApplicationInterface
 {

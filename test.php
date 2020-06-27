@@ -1,7 +1,7 @@
 <?php
 
 use Tkotosz\CliAppWrapper\CliAppWrapper;
-use Tkotosz\CliAppWrapperApi\ApplicationConfig;
+use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
 
 require __DIR__ . '/vendor/autoload.php';
 

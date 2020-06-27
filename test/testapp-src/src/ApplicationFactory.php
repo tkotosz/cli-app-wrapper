@@ -2,9 +2,9 @@
 
 namespace Tkotosz\TestApp;
 
-use Tkotosz\CliAppWrapperApi\Application as ApplicationInterface;
-use Tkotosz\CliAppWrapperApi\ApplicationManager;
-use Tkotosz\CliAppWrapperApi\ApplicationFactory as ApplicationFactoryInterface;
+use Tkotosz\CliAppWrapperApi\Api\V1\Application as ApplicationInterface;
+use Tkotosz\CliAppWrapperApi\Api\V1\ApplicationManager;
+use Tkotosz\CliAppWrapperApi\Api\V1\ApplicationFactory as ApplicationFactoryInterface;
 
 class ApplicationFactory implements ApplicationFactoryInterface
 {

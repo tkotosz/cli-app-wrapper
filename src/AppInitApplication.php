@@ -5,7 +5,7 @@ namespace Tkotosz\CliAppWrapper;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Tkotosz\CliAppWrapper\Console\Command\InitCommand;
 use Tkotosz\CliAppWrapper\Console\Command\InitHelpCommand;
-use Tkotosz\CliAppWrapperApi\Application;
+use Tkotosz\CliAppWrapperApi\Api\V1\Application;
 
 class AppInitApplication implements Application
 {
