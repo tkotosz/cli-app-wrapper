@@ -67,4 +67,9 @@ class InitHelpCommand extends Command
 
         return 0;
     }
+
+    public function setCommand()
+    {
+        return $this;
+    }
 }

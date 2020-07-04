@@ -6,7 +6,6 @@ use Exception;
 use Github\Client;
 use Symfony\Component\Filesystem\Filesystem;
 use Tkotosz\CliAppWrapperApi\Api\V1\Application;
-use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\WorkingMode;
 
 class CliAppWrapper

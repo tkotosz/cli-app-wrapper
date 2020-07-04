@@ -15,7 +15,6 @@ use Technodelight\GitShell\Api as Git;
 use Technodelight\ShellExec\Exec;
 use Tkotosz\CliAppWrapperApi\Api\V1\Application;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationCommandResult;
-use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationDirectory;
 use Tkotosz\CliAppWrapperApi\Api\V1\ApplicationFactory;
 use Tkotosz\CliAppWrapperApi\Api\V1\ApplicationManager as ApplicationManagerInterface;
@@ -23,7 +22,6 @@ use Tkotosz\CliAppWrapperApi\Api\V1\Model\Extension;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\Extensions;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ExtensionSource;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\ExtensionSources;
-use Tkotosz\CliAppWrapperApi\Api\V1\Model\FileName;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\RelativePath;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\WorkingDirectory;
 use Tkotosz\CliAppWrapperApi\Api\V1\Model\WorkingMode;
@@ -62,11 +60,6 @@ class ApplicationManager implements ApplicationManagerInterface
         $this->downloader = $downloader;
         $this->config = $config;
         $this->workingMode = $workingMode;
-    }
-
-    public function getApplicationConfig(): ApplicationConfig
-    {
-        return $this->config;
     }
 
     public function getWorkingMode(): WorkingMode
@@ -234,55 +227,6 @@ class ApplicationManager implements ApplicationManagerInterface
         return ExtensionSources::fromItems($sources);
     }
 
-    public function init(array $extensions = []): int
-    {
-        try {
-            $result = $this->composer()->init($this->getWorkingDirectory() . DIRECTORY_SEPARATOR . $this->config->appDir());
-            if ($result !== 0) {
-                $this->destroy();
-                return $result;
-            }
-
-            $config = $this->composer()->getComposerConfig();
-            foreach ($this->config->repositories() as $key => $repository) {
-                $config = $config->addRepository($key, $repository['type'], $repository['url']);
-            }
-            $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
-
-            $result = $this->composer()->changeComposerConfig($config);
-            if ($result !== 0) {
-                $this->destroy();
-                return $result;
-            }
-
-            $result = $this->composer()->installPackage($this->config->appPackage(), $this->config->appVersion());
-            if ($result !== 0) {
-                $this->destroy();
-                return $result;
-            }
-
-            foreach ($extensions as $extension) {
-                $result = $this->installExtension($extension);
-                if ($result->isFailure()) {
-                    $this->destroy();
-                    return $result->toInt();
-                }
-            }
-
-            $_SERVER['argv'] = []; // avoid leaking original input arguments to the app
-            $result = $this->createApplication()->init();
-            if ($result !== 0) {
-                $this->destroy();
-                return $result;
-            }
-
-            return 0;
-        } catch (Exception $e) {
-            $this->destroy();
-            return 255;
-        }
-    }
-
     public function update(): ApplicationCommandResult
     {
         $io = new SymfonyStyle(new ArgvInput(), new ConsoleOutput());
@@ -362,6 +306,60 @@ class ApplicationManager implements ApplicationManagerInterface
         $io->success('Application successfully updated.');
 
         return $successResult;
+    }
+
+    public function getApplicationConfig(): ApplicationConfig
+    {
+        return $this->config;
+    }
+
+    public function init(array $extensions = []): int
+    {
+        try {
+            $result = $this->composer()->init($this->getWorkingDirectory() . DIRECTORY_SEPARATOR . $this->config->appDir());
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            $config = $this->composer()->getComposerConfig();
+            foreach ($this->config->repositories() as $key => $repository) {
+                $config = $config->addRepository($key, $repository['type'], $repository['url']);
+            }
+            $config = $config->addProvide('tkotosz/cli-app-wrapper-api', '*');
+
+            $result = $this->composer()->changeComposerConfig($config);
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            $result = $this->composer()->installPackage($this->config->appPackage(), $this->config->appVersion());
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            foreach ($extensions as $extension) {
+                $result = $this->installExtension($extension);
+                if ($result->isFailure()) {
+                    $this->destroy();
+                    return $result->toInt();
+                }
+            }
+
+            $_SERVER['argv'] = []; // avoid leaking original input arguments to the app
+            $result = $this->createApplication()->init();
+            if ($result !== 0) {
+                $this->destroy();
+                return $result;
+            }
+
+            return 0;
+        } catch (Exception $e) {
+            $this->destroy();
+            return 255;
+        }
     }
 
     public function createApplication(): Application

@@ -1,7 +1,7 @@
 <?php
 
+use Tkotosz\CliAppWrapper\ApplicationConfig;
 use Tkotosz\CliAppWrapper\CliAppWrapper;
-use Tkotosz\CliAppWrapperApi\Api\V1\Model\ApplicationConfig;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -24,6 +24,9 @@ $config =  [
     ],
     'global_mode_enabled' => true,
     'local_mode_enabled' => true,
+    "app_executable_name" => "test",
+    "github_user" => "tkotosz",
+    "github_repository" => "test",
     'local_working_directory_resolvers' => ['git', 'cwd']
 ];
 
