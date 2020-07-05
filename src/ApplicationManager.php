@@ -429,7 +429,7 @@ class ApplicationManager implements ApplicationManagerInterface
     {
         return Extension::fromValues(
             $package->getName(),
-            $package->getVersion(),
+            $package->getPrettyVersion(),
             $package->getExtra()[$this->config->appExtensionsExtensionClassConfigField()]
         );
     }
